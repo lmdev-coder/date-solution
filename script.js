@@ -1,11 +1,12 @@
 // ================== НАСТРОЙКИ ==================
-const NETLIFY_URL = 'https://date-solution.netlify.app'; // ← замените на ваш URL Netlify
-const CORRECT_PASSWORD_HASH = null; // не нужно, хеш на сервере
+const NETLIFY_URL = 'https://random-name-123456.netlify.app'; // ← замените на ваш URL Netlify
+// ==================================================
 
 // ================== СОСТОЯНИЕ ==================
 let selectedTime = null;
 let selectedPlace = null;
-let authHash = null; // сюда сохраним хеш пароля после проверки
+let giftAnswer = null; // 'yes'
+let authHash = null;
 
 // ================== ХЕШИРОВАНИЕ ПАРОЛЯ ==================
 async function hashPassword(password) {
@@ -39,7 +40,6 @@ async function checkPassword() {
   }
 
   try {
-    // Хешируем пароль и отправляем на сервер
     const hash = await hashPassword(password);
     const response = await fetch(`${NETLIFY_URL}/.netlify/functions/validate-password`, {
       method: 'POST',
@@ -51,7 +51,7 @@ async function checkPassword() {
     });
 
     if (response.ok) {
-      authHash = hash; // сохраняем для последующих запросов
+      authHash = hash;
       sessionStorage.setItem('authHash', hash);
       errorEl.textContent = '';
       showStep('step-question');
@@ -71,7 +71,7 @@ if (savedHash) {
   showStep('step-question');
 }
 
-// ================== ШАГ 1: ИГРА С КНОПКАМИ ==================
+// ================== ШАГ 1: ВОПРОС "ПОЗАВТРАЕМ ВМЕСТЕ?" ==================
 const btnYes = document.getElementById('btn-yes');
 const btnNo = document.getElementById('btn-no');
 const buttonsContainer = document.getElementById('buttons-container');
@@ -105,22 +105,45 @@ document.querySelectorAll('.time-option.active-option').forEach(option => {
 document.querySelectorAll('.place-option').forEach(option => {
   option.addEventListener('click', () => {
     selectedPlace = option.dataset.place;
-    showFinalInvitation();
+    showStep('step-gift');
   });
 });
 
-// ================== ШАГ 4: ФИНАЛЬНОЕ ПРИГЛАШЕНИЕ ==================
-function formatTimeMinus30(timeStr) {
-  const [h, m] = timeStr.split(':').map(Number);
-  let totalMin = h * 60 + m - 30;
-  if (totalMin < 0) totalMin += 24 * 60;
-  return `${String(Math.floor(totalMin / 60)).padStart(2, '0')}:${String(totalMin % 60).padStart(2, '0')}`;
+// ================== ШАГ 4: ВОПРОС О ПОДАРКЕ ==================
+const btnGiftYes = document.getElementById('btn-gift-yes');
+const btnGiftNo = document.getElementById('btn-gift-no');
+const giftButtonsContainer = document.getElementById('gift-buttons-container');
+
+function swapGiftButtons() {
+  const first = giftButtonsContainer.firstElementChild;
+  const second = giftButtonsContainer.lastElementChild;
+  if (first && second) {
+    giftButtonsContainer.insertBefore(second, first);
+  }
 }
 
+btnGiftNo.addEventListener('mouseenter', swapGiftButtons);
+btnGiftNo.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  swapGiftButtons();
+}, { passive: false });
+
+btnGiftYes.addEventListener('click', () => {
+  giftAnswer = 'yes';
+  showFinalInvitation();
+});
+btnGiftNo.addEventListener('click', () => {
+  giftAnswer = 'yes'; // всё равно да
+  showFinalInvitation();
+});
+
+// ================== ШАГ 5: ФИНАЛЬНОЕ СООБЩЕНИЕ ==================
 function showFinalInvitation() {
-  const pickUpTime = formatTimeMinus30(selectedTime);
-  document.getElementById('final-message').innerHTML =
-    `Заберу тебя сегодня в <strong>${pickUpTime}</strong>, солнышко 💕😊`;
+  const messageEl = document.getElementById('final-message');
+  messageEl.innerHTML = `
+    Отправлю, что заеду за тобой после массажа и мы поедем на завтрак.<br>
+    Сладких снов, булочка 💕🌙
+  `;
   showStep('step-final');
   saveResponseToServer();
 }
@@ -140,6 +163,7 @@ async function saveResponseToServer() {
       body: JSON.stringify({
         time: selectedTime,
         place: selectedPlace,
+        gift: giftAnswer,
       }),
     });
 
