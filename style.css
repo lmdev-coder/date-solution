@@ -16,7 +16,7 @@ body {
   animation: gradientShift 15s ease infinite;
   overflow: hidden;
   position: relative;
-  touch-action: manipulation; /* убирает двойной тап зум на мобильных */
+  touch-action: manipulation;
 }
 
 @keyframes gradientShift {
@@ -150,7 +150,7 @@ h1 {
   font-weight: bold;
 }
 
-/* ===== Контейнер для кнопок вопроса ===== */
+/* ===== Контейнер для кнопок ===== */
 .buttons-container {
   display: flex;
   justify-content: center;
@@ -200,6 +200,7 @@ h1 {
   flex-wrap: wrap;
   gap: 12px;
   justify-content: center;
+  margin-bottom: 10px;
 }
 
 .place-option {
@@ -214,7 +215,6 @@ h1 {
   font-weight: bold;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  flex: 1 1 auto;
   min-width: 120px;
 }
 
@@ -226,6 +226,12 @@ h1 {
 
 .place-option:active {
   transform: scale(0.96);
+}
+
+.place-comment {
+  color: #888;
+  font-style: italic;
+  margin-top: 5px;
 }
 
 /* ===== Финальная карточка ===== */
