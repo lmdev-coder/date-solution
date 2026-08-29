@@ -17,7 +17,7 @@ body {
   overflow: hidden;
   position: relative;
   touch-action: manipulation;
-  padding: 20px; /* добавим отступ, чтобы карточка не прилипала */
+  padding: 20px;
 }
 
 @keyframes gradientShift {
@@ -167,15 +167,53 @@ h1 {
   min-height: 60px;
 }
 
-/* ===== Опции времени ===== */
-.time-options {
+/* ===== Мультиселект стран ===== */
+.countries-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.country-option {
+  padding: 12px 20px;
+  font-size: 1rem;
+  border: 2px solid #ffb3c6;
+  background: white;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.25s;
+  color: #d6336c;
+  font-weight: bold;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  min-width: 130px;
+}
+
+.country-option:hover {
+  background: #ffe0e9;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(214, 51, 108, 0.2);
+}
+
+.country-option.selected {
+  background: #ff6b9d;
+  color: white;
+  border-color: #ff4d8d;
+  box-shadow: 0 4px 10px rgba(255, 107, 157, 0.3);
+}
+
+/* ===== Опции отеля и дат ===== */
+.hotel-options,
+.dates-options {
   display: flex;
   flex-direction: column;
   gap: 10px;
   align-items: center;
 }
 
-.time-option {
+.hotel-option,
+.date-option {
   padding: 18px 45px;
   border-radius: 20px;
   background: #fff0f5;
@@ -188,56 +226,19 @@ h1 {
   box-shadow: 0 4px 10px rgba(255, 107, 157, 0.2);
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+  text-align: center;
 }
 
-.time-option.active-option:hover {
+.hotel-option.active-option:hover,
+.date-option.active-option:hover {
   transform: scale(1.05);
   background: #ffd6e0;
   box-shadow: 0 6px 15px rgba(255, 107, 157, 0.3);
 }
 
-.time-option.active-option:active {
+.hotel-option.active-option:active,
+.date-option.active-option:active {
   transform: scale(0.98);
-}
-
-/* ===== Опции места ===== */
-.place-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
-.place-option {
-  padding: 15px 22px;
-  font-size: 1.05rem;
-  border: 2px solid #ffb3c6;
-  background: white;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: all 0.25s;
-  color: #d6336c;
-  font-weight: bold;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  min-width: 120px;
-}
-
-.place-option:hover {
-  background: #ffe0e9;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(214, 51, 108, 0.2);
-}
-
-.place-option:active {
-  transform: scale(0.96);
-}
-
-.place-comment {
-  color: #888;
-  font-style: italic;
-  margin-top: 5px;
 }
 
 /* ===== Финальная карточка ===== */
@@ -357,15 +358,16 @@ h1 {
     height: 50px;
   }
 
-  .time-option {
+  .hotel-option,
+  .date-option {
     padding: 14px 30px;
     font-size: 1.1rem;
   }
 
-  .place-option {
-    padding: 12px 18px;
-    font-size: 0.95rem;
-    min-width: 100px;
+  .country-option {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    min-width: 110px;
   }
 
   #password-input {
