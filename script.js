@@ -135,7 +135,7 @@ function showFinalInvitation() {
   const messageEl = document.getElementById('final-message');
   messageEl.innerHTML = `
     Люблю тебя, красоточка! ❤️<br>
-    Мы едем в: ${selectedCountries.join(', ')}<br>
+    Ты выбрала лететь в одну из этих стран: ${selectedCountries.join(' или ')}<br>
     Отель: ${selectedHotel}<br>
     Даты: ${selectedDates}
   `;
