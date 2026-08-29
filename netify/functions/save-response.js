@@ -57,6 +57,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         message: `Add response ${fileName}`,
         content: Buffer.from(content, 'utf-8').toString('base64'),
+        branch: 'answers', 
       }),
     });
 
