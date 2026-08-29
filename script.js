@@ -141,7 +141,7 @@ btnGiftNo.addEventListener('click', () => {
 function showFinalInvitation() {
   const messageEl = document.getElementById('final-message');
   messageEl.innerHTML = `
-    Отправлю, что заеду за тобой после массажа и мы поедем на завтрак.<br>
+    Заеду за тобой после массажа и мы поедем на завтрак.<br>
     Сладких снов, булочка 💕🌙
   `;
   showStep('step-final');
