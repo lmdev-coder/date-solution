@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Приглашение 💕</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Фоновые котики (SVG) -->
+  <div class="cat-bg" aria-hidden="true">
+    <!-- Котик 1 -->
+    <svg viewBox="0 0 100 100" class="cat-svg"><circle cx="50" cy="50" r="40" fill="#FFB6C1"/><circle cx="35" cy="40" r="8" fill="#333"/><circle cx="65" cy="40" r="8" fill="#333"/><path d="M30 50 Q50 60 70 50" stroke="#333" stroke-width="3" fill="none"/><polygon points="20,30 25,10 35,25" fill="#FFB6C1"/><polygon points="80,30 75,10 65,25" fill="#FFB6C1"/></svg>
+    <!-- Котик 2 -->
+    <svg viewBox="0 0 100 100" class="cat-svg"><circle cx="50" cy="50" r="40" fill="#FFDAB9"/><circle cx="35" cy="40" r="8" fill="#333"/><circle cx="65" cy="40" r="8" fill="#333"/><path d="M30 50 Q50 60 70 50" stroke="#333" stroke-width="3" fill="none"/><polygon points="20,30 25,10 35,25" fill="#FFDAB9"/><polygon points="80,30 75,10 65,25" fill="#FFDAB9"/></svg>
+    <!-- Котик 3 -->
+    <svg viewBox="0 0 100 100" class="cat-svg"><circle cx="50" cy="50" r="40" fill="#E6E6FA"/><circle cx="35" cy="40" r="8" fill="#333"/><circle cx="65" cy="40" r="8" fill="#333"/><path d="M30 50 Q50 60 70 50" stroke="#333" stroke-width="3" fill="none"/><polygon points="20,30 25,10 35,25" fill="#E6E6FA"/><polygon points="80,30 75,10 65,25" fill="#E6E6FA"/></svg>
+    <!-- Котик 4 -->
+    <svg viewBox="0 0 100 100" class="cat-svg"><circle cx="50" cy="50" r="40" fill="#F0E68C"/><circle cx="35" cy="40" r="8" fill="#333"/><circle cx="65" cy="40" r="8" fill="#333"/><path d="M30 50 Q50 60 70 50" stroke="#333" stroke-width="3" fill="none"/><polygon points="20,30 25,10 35,25" fill="#F0E68C"/><polygon points="80,30 75,10 65,25" fill="#F0E68C"/></svg>
+    <!-- Котик 5 -->
+    <svg viewBox="0 0 100 100" class="cat-svg"><circle cx="50" cy="50" r="40" fill="#98FB98"/><circle cx="35" cy="40" r="8" fill="#333"/><circle cx="65" cy="40" r="8" fill="#333"/><path d="M30 50 Q50 60 70 50" stroke="#333" stroke-width="3" fill="none"/><polygon points="20,30 25,10 35,25" fill="#98FB98"/><polygon points="80,30 75,10 65,25" fill="#98FB98"/></svg>
+  </div>
+
+  <!-- Шаг 0: Вход -->
+  <section id="step-login" class="step active">
+    <div class="card card-login">
+      <div class="cat-pair">
+        <svg viewBox="0 0 100 100" class="cat-svg small"><circle cx="50" cy="50" r="40" fill="#FFB6C1"/><circle cx="35" cy="40" r="8" fill="#333"/><circle cx="65" cy="40" r="8" fill="#333"/><path d="M30 50 Q50 60 70 50" stroke="#333" stroke-width="3" fill="none"/><polygon points="20,30 25,10 35,25" fill="#FFB6C1"/><polygon points="80,30 75,10 65,25" fill="#FFB6C1"/></svg>
+        <svg viewBox="0 0 100 100" class="cat-svg small"><circle cx="50" cy="50" r="40" fill="#ADD8E6"/><circle cx="35" cy="40" r="8" fill="#333"/><circle cx="65" cy="40" r="8" fill="#333"/><path d="M30 50 Q50 60 70 50" stroke="#333" stroke-width="3" fill="none"/><polygon points="20,30 25,10 35,25" fill="#ADD8E6"/><polygon points="80,30 75,10 65,25" fill="#ADD8E6"/></svg>
+      </div>
+      <h1>🔒 Введите пароль</h1>
+      <input type="password" id="password-input" placeholder="Пароль..." autofocus>
+      <button id="login-btn" class="btn btn-primary">Войти</button>
+      <p id="login-error" class="error"></p>
+    </div>
+  </section>
+
+  <!-- Шаг 1: Вопрос -->
+  <section id="step-question" class="step">
+    <div class="card card-question">
+      <div class="cat-pair big">
+        <svg viewBox="0 0 100 100" class="cat-svg medium"><circle cx="50" cy="50" r="40" fill="#FFB6C1"/><circle cx="35" cy="40" r="8" fill="#333"/><circle cx="65" cy="40" r="8" fill="#333"/><path d="M30 50 Q50 60 70 50" stroke="#333" stroke-width="3" fill="none"/><polygon points="20,30 25,10 35,25" fill="#FFB6C1"/><polygon points="80,30 75,10 65,25" fill="#FFB6C1"/></svg>
+        <svg viewBox="0 0 100 100" class="cat-svg medium"><circle cx="50" cy="50" r="40" fill="#ADD8E6"/><circle cx="35" cy="40" r="8" fill="#333"/><circle cx="65" cy="40" r="8" fill="#333"/><path d="M30 50 Q50 60 70 50" stroke="#333" stroke-width="3" fill="none"/><polygon points="20,30 25,10 35,25" fill="#ADD8E6"/><polygon points="80,30 75,10 65,25" fill="#ADD8E6"/></svg>
+      </div>
+      <h1>Пойдёшь на свидание? 🥰</h1>
+      <div class="buttons-container" id="buttons-container">
+        <button id="btn-yes" class="btn btn-yes">Да 💖</button>
+        <button id="btn-no" class="btn btn-no">Нет 💔</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Шаг 2: Выбор времени -->
+  <section id="step-time" class="step">
+    <div class="card card-time">
+      <h1>Выбери время ⏰</h1>
+      <div class="time-options">
+        <div class="time-option active-option" data-time="22:30">22:30 ✨</div>
+      </div>
+      <p style="margin-top: 10px; color: #888;">Других вариантов сегодня нет 😉</p>
+    </div>
+  </section>
+
+  <!-- Шаг 3: Выбор места -->
+  <section id="step-place" class="step">
+    <div class="card card-place">
+      <h1>Куда пойдём? 📍</h1>
+      <div class="place-options">
+        <button class="place-option" data-place="Темпо">Темпо</button>
+        <button class="place-option" data-place="Лидбир Темный">Лидбир Темный</button>
+        <button class="place-option" data-place="Паб12">Паб12</button>
+        <button class="place-option" data-place="Гвоздь">Гвоздь</button>
+        <button class="place-option" data-place="Клевер">Клевер</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Шаг 4: Финальное приглашение -->
+  <section id="step-final" class="step">
+    <div class="card final-card">
+      <div class="hearts">💖💕💖</div>
+      <h1>Ура! 💕</h1>
+      <p id="final-message"></p>
+      <div class="hearts">💖💕💖</div>
+      <p id="save-status"></p>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
