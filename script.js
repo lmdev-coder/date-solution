@@ -1,11 +1,10 @@
 // ================== НАСТРОЙКИ ==================
-const NETLIFY_URL = 'https://date-solution.netlify.app'; // ← замените на ваш URL Netlify
-// ==================================================
+const NETLIFY_URL = 'https://date-solution.netlify.app'; // ← ваш URL
 
 // ================== СОСТОЯНИЕ ==================
-let selectedTime = null;
-let selectedPlace = null;
-let giftAnswer = null; // 'yes'
+let selectedCountries = [];  // массив выбранных стран
+let selectedHotel = null;
+let selectedDates = null;
 let authHash = null;
 
 // ================== ХЕШИРОВАНИЕ ПАРОЛЯ ==================
@@ -71,7 +70,7 @@ if (savedHash) {
   showStep('step-question');
 }
 
-// ================== ШАГ 1: ВОПРОС "ПОЗАВТРАЕМ ВМЕСТЕ?" ==================
+// ================== ШАГ 1: ВОПРОС "ПОЕДЕШЬ В ОТПУСК?" ==================
 const btnYes = document.getElementById('btn-yes');
 const btnNo = document.getElementById('btn-no');
 const buttonsContainer = document.getElementById('buttons-container');
@@ -90,59 +89,55 @@ btnNo.addEventListener('touchstart', (e) => {
   swapButtons();
 }, { passive: false });
 
-btnYes.addEventListener('click', () => showStep('step-time'));
-btnNo.addEventListener('click', () => showStep('step-time'));
+btnYes.addEventListener('click', () => showStep('step-countries'));
+btnNo.addEventListener('click', () => showStep('step-countries'));
 
-// ================== ШАГ 2: ВЫБОР ВРЕМЕНИ ==================
-document.querySelectorAll('.time-option.active-option').forEach(option => {
-  option.addEventListener('click', () => {
-    selectedTime = option.dataset.time;
-    showStep('step-place');
+// ================== ШАГ 2: МУЛЬТИСЕЛЕКТ СТРАН ==================
+const countryButtons = document.querySelectorAll('.country-option');
+countryButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('selected');
+    const country = btn.dataset.country;
+    if (btn.classList.contains('selected')) {
+      selectedCountries.push(country);
+    } else {
+      selectedCountries = selectedCountries.filter(c => c !== country);
+    }
   });
 });
 
-// ================== ШАГ 3: ВЫБОР МЕСТА ==================
-document.querySelectorAll('.place-option').forEach(option => {
-  option.addEventListener('click', () => {
-    selectedPlace = option.dataset.place;
-    showStep('step-gift');
-  });
-});
-
-// ================== ШАГ 4: ВОПРОС О ПОДАРКЕ ==================
-const btnGiftYes = document.getElementById('btn-gift-yes');
-const btnGiftNo = document.getElementById('btn-gift-no');
-const giftButtonsContainer = document.getElementById('gift-buttons-container');
-
-function swapGiftButtons() {
-  const first = giftButtonsContainer.firstElementChild;
-  const second = giftButtonsContainer.lastElementChild;
-  if (first && second) {
-    giftButtonsContainer.insertBefore(second, first);
+document.getElementById('btn-countries-next').addEventListener('click', () => {
+  if (selectedCountries.length > 0) {
+    showStep('step-hotel');
+  } else {
+    alert('Выбери хотя бы одну страну 😉');
   }
-}
-
-btnGiftNo.addEventListener('mouseenter', swapGiftButtons);
-btnGiftNo.addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  swapGiftButtons();
-}, { passive: false });
-
-btnGiftYes.addEventListener('click', () => {
-  giftAnswer = 'yes';
-  showFinalInvitation();
 });
-btnGiftNo.addEventListener('click', () => {
-  giftAnswer = 'yes'; // всё равно да
-  showFinalInvitation();
+
+// ================== ШАГ 3: ВЫБОР ОТЕЛЯ ==================
+document.querySelectorAll('.hotel-option.active-option').forEach(option => {
+  option.addEventListener('click', () => {
+    selectedHotel = option.dataset.hotel;
+    showStep('step-dates');
+  });
+});
+
+// ================== ШАГ 4: ВЫБОР ДАТ ==================
+document.querySelectorAll('.date-option.active-option').forEach(option => {
+  option.addEventListener('click', () => {
+    selectedDates = option.dataset.dates;
+    showFinalInvitation();
+  });
 });
 
 // ================== ШАГ 5: ФИНАЛЬНОЕ СООБЩЕНИЕ ==================
 function showFinalInvitation() {
   const messageEl = document.getElementById('final-message');
   messageEl.innerHTML = `
-    Заеду за тобой после массажа и мы поедем на завтрак.<br>
-    Сладких снов, булочка 💕🌙
+    Люблю тебя, красоточка! ❤️<br>
+    Мы едем в: ${selectedCountries.join(', ')}<br>
+    Отель: ${selectedHotel}<br>
+    Даты: ${selectedDates}
   `;
   showStep('step-final');
   saveResponseToServer();
@@ -161,9 +156,9 @@ async function saveResponseToServer() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        time: selectedTime,
-        place: selectedPlace,
-        gift: giftAnswer,
+        countries: selectedCountries,
+        hotel: selectedHotel,
+        dates: selectedDates,
       }),
     });
 

@@ -1,3 +1,4 @@
+// netlify/functions/save-response.js
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_OWNER = process.env.GITHUB_OWNER;
 const GITHUB_REPO = process.env.GITHUB_REPO;
@@ -18,7 +19,6 @@ exports.handler = async (event) => {
     return { statusCode: 405, headers, body: 'Method Not Allowed' };
   }
 
-  // Проверяем пароль
   const authHeader = event.headers.authorization || '';
   const clientHash = authHeader.replace(/^Bearer\s+/i, '');
   if (clientHash !== PASSWORD_HASH) {
@@ -26,27 +26,24 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { time, place } = JSON.parse(event.body);
-    if (!time || !place) {
+    const { countries, hotel, dates } = JSON.parse(event.body);
+    if (!countries || !hotel || !dates) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing fields' }) };
     }
 
-    // Определяем IP пользователя (учитываем заголовки Netlify)
-    const ip = event.headers['x-forwarded-for']?.split(',')[0].trim() ||
-               event.headers['client-ip'] ||
+    const ip = event.headers['client-ip'] ||
+               event.headers['x-nf-client-connection-ip'] ||
                'unknown-ip';
 
-    // Формируем имя файла: answers/<дата>_<ip>.txt
     const now = new Date();
-    const dateStr = now.toISOString().slice(0, 10); // YYYY-MM-DD
-    const timeStr = now.toISOString().replace(/[:.]/g, '-'); // для уникальности
+    const dateStr = now.toISOString().slice(0, 10);
+    const timeStr = now.toISOString().replace(/[:.]/g, '-');
     const fileName = `answers/${dateStr}_${ip}_${timeStr}.txt`;
 
-    const content = `Время: ${time}\nМесто: ${place}\nЗаписано: ${now.toISOString()}\n`;
+    const content = `Страны: ${countries.join(', ')}\nОтель: ${hotel}\nДаты: ${dates}\nЗаписано: ${now.toISOString()}\n`;
 
     const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${fileName}`;
 
-    // Создаём новый файл (PUT без sha)
     const response = await fetch(apiUrl, {
       method: 'PUT',
       headers: {
@@ -57,7 +54,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         message: `Add response ${fileName}`,
         content: Buffer.from(content, 'utf-8').toString('base64'),
-        branch: 'answers', 
+        branch: 'answers', // если используете отдельную ветку
       }),
     });
 
