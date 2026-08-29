@@ -1,5 +1,5 @@
 // ================== НАСТРОЙКИ ==================
-const NETLIFY_URL = 'https://random-name-123456.netlify.app'; // ← замените на ваш URL Netlify
+const NETLIFY_URL = 'https://date-solution.netlify.app'; // ← замените на ваш URL Netlify
 // ==================================================
 
 // ================== СОСТОЯНИЕ ==================
