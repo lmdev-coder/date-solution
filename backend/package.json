@@ -1,0 +1,18 @@
+{
+  "name": "@date-solution/backend",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Netlify Functions (TypeScript) for the invitation app",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.700.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^2.8.2",
+    "@types/node": "^20.17.6",
+    "typescript": "^5.6.3"
+  }
+}

@@ -1,0 +1,19 @@
+[build]
+  command = "npm run build"
+  publish = "frontend/dist"
+  functions = "backend/netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+[dev]
+  command = "npm run dev:client"
+  targetPort = 5173
+  port = 8888
+  autoLaunch = false
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
