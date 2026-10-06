@@ -24,6 +24,11 @@ export function requirePost(event: HandlerEvent): HandlerResponse | null {
   return event.httpMethod === 'POST' ? null : errorResponse(405, 'Method Not Allowed');
 }
 
+/** Rejects every HTTP method except GET. */
+export function requireGet(event: HandlerEvent): HandlerResponse | null {
+  return event.httpMethod === 'GET' ? null : errorResponse(405, 'Method Not Allowed');
+}
+
 export function isPreflight(event: HandlerEvent): boolean {
   return event.httpMethod === 'OPTIONS';
 }

@@ -8,6 +8,12 @@ export type InvitationStep =
   | 'story'
   | 'brest'
   | 'final-story'
+  | 'dinner-story'
+  | 'dinner-places'
+  | 'dinner-time'
+  | 'final-dinner'
+  | 'anniversary-story'
+  | 'anniversary-gift'
   | 'question'
   | 'countries'
   | 'hotel'
@@ -34,7 +40,14 @@ export interface StoryAnswerV2 {
   brestTrip: boolean;
 }
 
+/** V3 payload: two dinner places and one meeting time. */
+export interface DinnerAnswerV3 {
+  version: 3;
+  places: string[];
+  time: string;
+}
+
 /** Payload accepted by `POST /.netlify/functions/save-response`. */
-export type InvitationAnswer = TravelAnswerV1 | StoryAnswerV2;
+export type InvitationAnswer = TravelAnswerV1 | StoryAnswerV2 | DinnerAnswerV3;
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'failed';

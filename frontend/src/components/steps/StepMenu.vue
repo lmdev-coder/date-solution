@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import CatPair from '@/components/CatPair.vue';
+import type { MenuItem } from '@/composables/useConfiguration';
 
-const emit = defineEmits<{ openStory: []; openTravel: [] }>();
+interface Props {
+  items: MenuItem[];
+}
+
+defineProps<Props>();
+
+const emit = defineEmits<{ open: [id: MenuItem['id']] }>();
 </script>
 
 <template>
@@ -9,11 +16,14 @@ const emit = defineEmits<{ openStory: []; openTravel: [] }>();
     <CatPair />
     <h1>Привет, красоточка! 💕</h1>
     <div class="menu-options">
-      <button class="menu-option menu-option--fresh" @click="emit('openStory')">
-        А тут у нас что-то новенькое 🤔
-      </button>
-      <button class="menu-option menu-option--legacy" @click="emit('openTravel')">
-        А тут выбор, куда поедем в отпуск 🌍
+      <button
+        v-for="item in items"
+        :key="item.id"
+        class="menu-option"
+        :class="item.isFresh ? 'menu-option--fresh' : 'menu-option--legacy'"
+        @click="emit('open', item.id)"
+      >
+        {{ item.label }}
       </button>
     </div>
   </section>

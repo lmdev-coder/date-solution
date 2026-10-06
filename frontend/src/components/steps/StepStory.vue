@@ -2,14 +2,20 @@
 import { computed, ref } from 'vue';
 
 import CatPair from '@/components/CatPair.vue';
-import { STORY_MESSAGES } from '@/constants/story';
+
+interface Props {
+  /** Messages revealed one at a time via the "Далее" button. */
+  messages: readonly string[];
+}
+
+const props = defineProps<Props>();
 
 const emit = defineEmits<{ finish: [] }>();
 
 const messageIndex = ref(0);
 
-const currentMessage = computed(() => STORY_MESSAGES[messageIndex.value]);
-const isLastMessage = computed(() => messageIndex.value === STORY_MESSAGES.length - 1);
+const currentMessage = computed(() => props.messages[messageIndex.value]);
+const isLastMessage = computed(() => messageIndex.value === props.messages.length - 1);
 
 function showNextMessage(): void {
   if (isLastMessage.value) {

@@ -16,6 +16,14 @@ const storyAnswerSchema = z.object({
   brestTrip: z.boolean({ required_error: 'Не указан ответ про поездку в Брест' }),
 });
 
+const dinnerAnswerSchema = z.object({
+  version: z.literal(3),
+  places: z
+    .array(z.string().trim().min(1, 'Название места не может быть пустым'))
+    .length(2, 'Выбери ровно два места'),
+  time: z.string().trim().min(1, 'Не указано время ужина'),
+});
+
 /**
  * Ties the runtime contract to the compile-time interface: zod fails to
  * compile if the two ever drift apart. The union is discriminated by
@@ -24,6 +32,7 @@ const storyAnswerSchema = z.object({
 export const invitationAnswerSchema: z.ZodType<InvitationAnswer> = z.discriminatedUnion('version', [
   travelAnswerSchema,
   storyAnswerSchema,
+  dinnerAnswerSchema,
 ]);
 
 /** Flattens zod issues into a single human-readable message. */
