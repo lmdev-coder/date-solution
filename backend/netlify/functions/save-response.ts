@@ -28,7 +28,7 @@ function getInvitationService(): InvitationService {
 /**
  * POST /.netlify/functions/save-response
  * Header: `Authorization: Bearer <sha256-hex-of-password>`
- * Body:   `{ countries: string[], hotel: string, dates: string }`
+ * Body:   discriminated union on `version` — V1 travel, V2 Brest trip, or V3 dinner.
  */
 export const handler: Handler = async (event) => {
   if (isPreflight(event)) {

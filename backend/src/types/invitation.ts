@@ -19,7 +19,15 @@ export interface StoryAnswerV2 {
   brestTrip: boolean;
 }
 
-export type InvitationAnswer = TravelAnswerV1 | StoryAnswerV2;
+/** V3: the dinner invitation — two places to eat and one time to meet. */
+export interface DinnerAnswerV3 {
+  /** Answer version; folded into the storage object name as `v3`. */
+  version: 3;
+  places: string[];
+  time: string;
+}
+
+export type InvitationAnswer = TravelAnswerV1 | StoryAnswerV2 | DinnerAnswerV3;
 
 /** Persisted shape written to object storage: the answer plus submission metadata. */
 export type InvitationRecord = InvitationAnswer & {

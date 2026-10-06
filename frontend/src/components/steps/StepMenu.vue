@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CatPair from '@/components/CatPair.vue';
 
-const emit = defineEmits<{ openStory: []; openTravel: [] }>();
+const emit = defineEmits<{ openStory: []; openTravel: []; openDinner: [] }>();
 </script>
 
 <template>
@@ -9,8 +9,11 @@ const emit = defineEmits<{ openStory: []; openTravel: [] }>();
     <CatPair />
     <h1>Привет, красоточка! 💕</h1>
     <div class="menu-options">
-      <button class="menu-option menu-option--fresh" @click="emit('openStory')">
+      <button class="menu-option menu-option--fresh" @click="emit('openDinner')">
         А тут у нас что-то новенькое 🤔
+      </button>
+      <button class="menu-option menu-option--legacy" @click="emit('openStory')">
+        Поездка в Брест ❤️
       </button>
       <button class="menu-option menu-option--legacy" @click="emit('openTravel')">
         А тут выбор, куда поедем в отпуск 🌍

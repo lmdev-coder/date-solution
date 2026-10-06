@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 
+import AutumnHearts from '@/components/AutumnHearts.vue';
 import CatBackground from '@/components/CatBackground.vue';
 import StepBrest from '@/components/steps/StepBrest.vue';
 import StepChoice from '@/components/steps/StepChoice.vue';
@@ -11,7 +12,9 @@ import StepMenu from '@/components/steps/StepMenu.vue';
 import StepQuestion from '@/components/steps/StepQuestion.vue';
 import StepStory from '@/components/steps/StepStory.vue';
 import { DATE_OPTIONS, HOTEL_OPTIONS } from '@/constants/invitation';
-import { BREST_AGREED_SUMMARY, BREST_DECLINED_SUMMARY } from '@/constants/story';
+import { DINNER_PLACE_OPTIONS, DINNER_STORY_MESSAGES, DINNER_TIME_OPTIONS } from '@/constants/dinner';
+import { BREST_AGREED_SUMMARY, BREST_DECLINED_SUMMARY, STORY_MESSAGES } from '@/constants/story';
+import { useDinnerSelection } from '@/composables/useDinnerSelection';
 import { useInvitationSaver } from '@/composables/useInvitationSaver';
 import { useInvitationSelection } from '@/composables/useInvitationSelection';
 import { usePasswordAuth } from '@/composables/usePasswordAuth';
@@ -30,6 +33,14 @@ const {
 const { countries, answer, summaryLines, toggleCountry, selectHotel, selectDates } =
   useInvitationSelection();
 
+const {
+  places: dinnerPlaces,
+  answer: dinnerAnswer,
+  summaryLines: dinnerSummaryLines,
+  togglePlace: toggleDinnerPlace,
+  selectTime: selectDinnerTime,
+} = useDinnerSelection();
+
 const { statusMessage, save: saveAnswer } = useInvitationSaver();
 
 /** Single source of truth for which screen is on top. */
@@ -45,6 +56,17 @@ const brestSummaryLines = computed(() => {
 
   return [brestTrip.value ? BREST_AGREED_SUMMARY : BREST_DECLINED_SUMMARY];
 });
+
+/** Steps that belong to the V3 dinner game. */
+const DINNER_STEPS: readonly InvitationStep[] = [
+  'dinner-story',
+  'dinner-places',
+  'dinner-time',
+  'final-dinner',
+];
+
+/** Whether the falling-hearts-and-leaves overlay should be visible. */
+const isDinnerActive = computed(() => DINNER_STEPS.includes(step.value));
 
 onMounted(() => {
   if (restore()) {
@@ -95,11 +117,23 @@ async function handleBrestAnswer(trip: boolean): Promise<void> {
   const storyAnswer: StoryAnswerV2 = { version: 2, brestTrip: trip };
   await saveAnswer(authToken, storyAnswer);
 }
+
+async function handleDinnerTimeChoice(option: Option): Promise<void> {
+  selectDinnerTime(option.id);
+  step.value = 'final-dinner';
+
+  const authToken = authHash.value;
+  const dinner = dinnerAnswer.value;
+  if (authToken && dinner) {
+    await saveAnswer(authToken, dinner);
+  }
+}
 </script>
 
 <template>
   <main class="app">
     <CatBackground />
+    <AutumnHearts v-if="isDinnerActive" />
 
     <Transition name="step" mode="out-in">
       <StepLogin
@@ -113,10 +147,15 @@ async function handleBrestAnswer(trip: boolean): Promise<void> {
         v-else-if="step === 'menu'"
         @open-story="step = 'story'"
         @open-travel="step = 'question'"
+        @open-dinner="step = 'dinner-story'"
       />
 
       <!-- V2: мини-игра про Брест -->
-      <StepStory v-else-if="step === 'story'" @finish="step = 'brest'" />
+      <StepStory
+        v-else-if="step === 'story'"
+        :messages="STORY_MESSAGES"
+        @finish="step = 'brest'"
+      />
 
       <StepBrest v-else-if="step === 'brest'" @answer="handleBrestAnswer" />
 
@@ -124,6 +163,40 @@ async function handleBrestAnswer(trip: boolean): Promise<void> {
         v-else-if="step === 'final-story'"
         :summary-lines="brestSummaryLines"
         :status="statusMessage"
+      />
+
+      <!-- V3: ужин-приглашение -->
+      <StepStory
+        v-else-if="step === 'dinner-story'"
+        :messages="DINNER_STORY_MESSAGES"
+        @finish="step = 'dinner-places'"
+      />
+
+      <StepCountries
+        v-else-if="step === 'dinner-places'"
+        :selected="dinnerPlaces"
+        :options="DINNER_PLACE_OPTIONS"
+        title="Куда пойдём на ужин? 🍽️"
+        hint="Можно выбрать только два места 😉 (шутка, серьёзно — два!)"
+        next-label="Выбрали! 😋"
+        :next-disabled="dinnerPlaces.length !== 2"
+        @toggle="toggleDinnerPlace"
+        @next="step = 'dinner-time'"
+      />
+
+      <StepChoice
+        v-else-if="step === 'dinner-time'"
+        title="Во сколько встречаемся? ⏰"
+        hint="Только один вариант 😉"
+        :options="DINNER_TIME_OPTIONS"
+        @choose="handleDinnerTimeChoice"
+      />
+
+      <StepFinal
+        v-else-if="step === 'final-dinner'"
+        :summary-lines="dinnerSummaryLines"
+        :status="statusMessage"
+        show-gift
       />
 
       <!-- V1: выбор страны, отеля и дат -->
