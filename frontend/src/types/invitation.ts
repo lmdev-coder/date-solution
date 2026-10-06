@@ -12,6 +12,8 @@ export type InvitationStep =
   | 'dinner-places'
   | 'dinner-time'
   | 'final-dinner'
+  | 'anniversary-story'
+  | 'anniversary-gift'
   | 'question'
   | 'countries'
   | 'hotel'

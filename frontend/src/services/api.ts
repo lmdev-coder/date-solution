@@ -1,4 +1,5 @@
 import type { InvitationAnswer } from '@/types/invitation';
+import type { AppConfiguration, GameId } from '@/types/configuration';
 
 /** Functions are served from the same origin, both in production and via `netlify dev`. */
 const API_BASE_URL = '/.netlify/functions';
@@ -32,8 +33,31 @@ export function validatePassword(authHash: string): Promise<ValidatePasswordResu
   return postJson<ValidatePasswordResult>('/validate-password', authHash, {});
 }
 
+export function fetchConfiguration(authHash: string): Promise<AppConfiguration> {
+  return getJson<AppConfiguration>('/configuration', authHash);
+}
+
+export function completeGame(authHash: string, gameId: GameId): Promise<AppConfiguration> {
+  return postJson<AppConfiguration>('/configuration', authHash, { id: gameId });
+}
+
 export function saveInvitation(authHash: string, answer: InvitationAnswer): Promise<SaveResponseResult> {
   return postJson<SaveResponseResult>('/save-response', authHash, answer);
+}
+
+async function getJson<TResponse>(endpoint: string, authHash: string | null): Promise<TResponse> {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: 'GET',
+    headers: {
+      ...(authHash ? { Authorization: `Bearer ${authHash}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await readErrorMessage(response));
+  }
+
+  return (await response.json()) as TResponse;
 }
 
 async function postJson<TResponse>(endpoint: string, authHash: string | null, body: unknown): Promise<TResponse> {

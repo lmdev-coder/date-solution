@@ -38,7 +38,6 @@ export function useDinnerSelection(): DinnerSelection {
       'Спасибо тебе ещё раз, что мы вместе и что ты — моя жена ❤️',
       `Наш ужин: ${answer.value.places.join(' и ')}`,
       `Во сколько: ${answer.value.time}`,
-      'Я тебя очень люблю и надеюсь, что тебе понравится подарок',
       'Очень жду нашей встречи 💕',
     ];
   });
