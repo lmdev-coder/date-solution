@@ -5,15 +5,20 @@ interface Props {
   title: string;
   hint: string;
   options: readonly Option[];
+  showHome?: boolean;
+  winter?: boolean;
 }
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), { showHome: false, winter: false });
 
-const emit = defineEmits<{ choose: [option: Option] }>();
+const emit = defineEmits<{ choose: [option: Option]; home: [] }>();
 </script>
 
 <template>
-  <section class="card">
+  <section class="card game-card" :class="{ 'winter-card': winter }">
+    <button v-if="showHome" type="button" class="home-control" aria-label="На главную" title="На главную" @click="emit('home')">
+      <span aria-hidden="true">×</span>
+    </button>
     <h1>{{ title }}</h1>
     <div class="choice-options">
       <button

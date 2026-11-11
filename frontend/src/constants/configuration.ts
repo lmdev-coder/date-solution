@@ -9,7 +9,7 @@ export const DEFAULT_CONFIGURATION: AppConfiguration = {
     {
       id: 'gift',
       freshLabel: 'А тут у нас что-то новенькое 🤔',
-      doneLabel: 'Локация подарка на годовщину 🔍',
+      doneLabel: 'Новогодний квест завершён ❄️',
       active: true,
       done: false,
     },
