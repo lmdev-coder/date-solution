@@ -20,7 +20,7 @@ function submitPassword(): void {
 </script>
 
 <template>
-  <section class="card">
+  <section class="card login-card">
     <CatPair />
     <h1>🔒 Введите пароль</h1>
     <input

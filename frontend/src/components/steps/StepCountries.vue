@@ -9,6 +9,8 @@ interface Props {
   nextLabel?: string;
   hint?: string;
   nextDisabled?: boolean;
+  showHome?: boolean;
+  winter?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -17,13 +19,18 @@ withDefaults(defineProps<Props>(), {
   nextLabel: 'Вот это хочу 😍',
   hint: '',
   nextDisabled: false,
+  showHome: false,
+  winter: false,
 });
 
-const emit = defineEmits<{ toggle: [id: string]; next: [] }>();
+const emit = defineEmits<{ toggle: [id: string]; next: []; home: [] }>();
 </script>
 
 <template>
-  <section class="card">
+  <section class="card game-card" :class="{ 'winter-card': winter }">
+    <button v-if="showHome" type="button" class="home-control" aria-label="На главную" title="На главную" @click="emit('home')">
+      <span aria-hidden="true">×</span>
+    </button>
     <h1>{{ title }}</h1>
     <div class="countries-options">
       <button

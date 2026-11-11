@@ -5,7 +5,7 @@ import CatPair from '@/components/CatPair.vue';
 
 type AnswerButtonId = 'yes' | 'no';
 
-const emit = defineEmits<{ answer: [] }>();
+const emit = defineEmits<{ answer: []; home: [] }>();
 
 /** Both buttons lead to the same place; "Нет" just refuses to be clicked. */
 const buttonOrder = ref<AnswerButtonId[]>(['yes', 'no']);
@@ -16,7 +16,10 @@ function dodgeCursor(): void {
 </script>
 
 <template>
-  <section class="card">
+  <section class="card game-card">
+    <button type="button" class="home-control" aria-label="На главную" title="На главную" @click="emit('home')">
+      <span aria-hidden="true">×</span>
+    </button>
     <CatPair variant="md" />
     <h1>Любовь моя, поедешь со мной в отпуск? ✈️</h1>
     <div class="buttons-container">

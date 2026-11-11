@@ -58,6 +58,20 @@ const {
 /** Single source of truth for which screen is on top. */
 const step = ref<InvitationStep>('login');
 
+/** Current game, used by the persistent close-to-home control. */
+const activeGame = ref<GameId | null>(null);
+
+function returnHome(): void {
+  activeGame.value = null;
+  step.value = 'menu';
+}
+
+/** Send the completion request only after the flow reaches its final screen. */
+function finishActiveGame(id: GameId): void {
+  completeActiveGame(id);
+  activeGame.value = null;
+}
+
 /** V2 answer; `null` until the Brest question is answered. */
 const brestTrip = ref<boolean | null>(null);
 
@@ -77,14 +91,17 @@ const DINNER_STEPS: readonly InvitationStep[] = [
   'final-dinner',
 ];
 
-/** Steps of the hidden anniversary game. */
+/** Шаги новогоднего квеста с подарком. */
 const ANNIVERSARY_STEPS: readonly InvitationStep[] = ['anniversary-story', 'anniversary-gift'];
 
-/** Steps where the falling-hearts-and-leaves overlay should be visible. */
+/** Dinner and anniversary flows keep their original autumnal atmosphere. */
 const FALLING_EFFECT_STEPS: readonly InvitationStep[] = [
   ...DINNER_STEPS,
   ...ANNIVERSARY_STEPS,
 ];
+
+/** New Year quest gets a separate snowfall overlay. */
+const WINTER_EFFECT_STEPS: readonly InvitationStep[] = ['anniversary-story', 'anniversary-gift'];
 
 /** Whether the falling-hearts-and-leaves overlay is on screen. */
 const isFallingEffectsActive = computed(() => FALLING_EFFECT_STEPS.includes(step.value));
@@ -112,6 +129,7 @@ async function handleLogin(password: string): Promise<void> {
 }
 
 function handleMenuOpen(gameId: GameId): void {
+  activeGame.value = gameId;
   step.value = GAME_FIRST_STEP[gameId];
 }
 
@@ -142,52 +160,57 @@ function handleHotelChoice(option: Option): void {
 async function handleDatesChoice(option: Option): Promise<void> {
   selectDates(option);
   step.value = 'final';
-  completeActiveGame('travel');
 
   const authToken = authHash.value;
   const invitation = answer.value;
   if (authToken && invitation) {
     await saveAnswer(authToken, invitation);
   }
+  finishActiveGame('travel');
 }
 
 async function handleBrestAnswer(trip: boolean): Promise<void> {
   brestTrip.value = trip;
   step.value = 'final-story';
-  completeActiveGame('brest');
 
   const authToken = authHash.value;
-  if (!authToken) {
-    return;
+  if (authToken) {
+    const storyAnswer: StoryAnswerV2 = { version: 2, brestTrip: trip };
+    await saveAnswer(authToken, storyAnswer);
   }
-
-  const storyAnswer: StoryAnswerV2 = { version: 2, brestTrip: trip };
-  await saveAnswer(authToken, storyAnswer);
+  finishActiveGame('brest');
 }
 
 async function handleDinnerTimeChoice(option: Option): Promise<void> {
   selectDinnerTime(option.id);
   step.value = 'final-dinner';
-  completeActiveGame('dinner');
 
   const authToken = authHash.value;
   const dinner = dinnerAnswer.value;
   if (authToken && dinner) {
     await saveAnswer(authToken, dinner);
   }
+  finishActiveGame('dinner');
 }
 
 function handleAnniversaryFinished(): void {
   step.value = 'anniversary-gift';
-  completeActiveGame('gift');
 }
 </script>
 
 <template>
   <main class="app">
-    <CatBackground />
-    <AutumnHearts v-if="isFallingEffectsActive" />
-
+    <CatBackground v-if="!WINTER_EFFECT_STEPS.includes(step)" />
+    <AutumnHearts v-if="isFallingEffectsActive && !WINTER_EFFECT_STEPS.includes(step)" />
+    <Transition name="winter-scene" mode="out-in">
+      <div v-if="WINTER_EFFECT_STEPS.includes(step)" key="winter" class="winter-scene" aria-hidden="true">
+        <span class="winter-scene__tree winter-scene__tree--left">🎄</span>
+        <span class="winter-scene__tree winter-scene__tree--right">🎄</span>
+        <span class="winter-scene__star winter-scene__star--one">✦</span>
+        <span class="winter-scene__star winter-scene__star--two">✧</span>
+      </div>
+    </Transition>
+    <AutumnHearts v-if="WINTER_EFFECT_STEPS.includes(step)" winter />
     <Transition name="step" mode="out-in">
       <StepLogin
         v-if="step === 'login'"
@@ -206,21 +229,28 @@ function handleAnniversaryFinished(): void {
       <StepStory
         v-else-if="step === 'story'"
         :messages="STORY_MESSAGES"
+        show-home
+        @home="returnHome"
         @finish="step = 'brest'"
       />
 
-      <StepBrest v-else-if="step === 'brest'" @answer="handleBrestAnswer" />
+      <StepBrest v-else-if="step === 'brest'" @home="returnHome" @answer="handleBrestAnswer" />
 
       <StepFinal
         v-else-if="step === 'final-story'"
         :summary-lines="brestSummaryLines"
         :status="statusMessage"
+        show-home
+        @home="returnHome"
       />
 
       <!-- V3: ужин-приглашение -->
       <StepStory
         v-else-if="step === 'dinner-story'"
         :messages="DINNER_STORY_MESSAGES"
+        :winter="WINTER_EFFECT_STEPS.includes(step)"
+        show-home
+        @home="returnHome"
         @finish="step = 'dinner-places'"
       />
 
@@ -228,10 +258,13 @@ function handleAnniversaryFinished(): void {
         v-else-if="step === 'dinner-places'"
         :selected="dinnerPlaces"
         :options="DINNER_PLACE_OPTIONS"
+        :winter="WINTER_EFFECT_STEPS.includes(step)"
         title="Куда пойдём на ужин? 🍽️"
         hint="Можно выбрать только два места 😉 (шутка, серьёзно — два!)"
         next-label="Выбрали! 😋"
         :next-disabled="dinnerPlaces.length !== 2"
+        show-home
+        @home="returnHome"
         @toggle="toggleDinnerPlace"
         @next="step = 'dinner-time'"
       />
@@ -241,6 +274,9 @@ function handleAnniversaryFinished(): void {
         title="Во сколько встречаемся? ⏰"
         hint="Только один вариант 😉"
         :options="DINNER_TIME_OPTIONS"
+        :winter="WINTER_EFFECT_STEPS.includes(step)"
+        show-home
+        @home="returnHome"
         @choose="handleDinnerTimeChoice"
       />
 
@@ -248,12 +284,18 @@ function handleAnniversaryFinished(): void {
         v-else-if="step === 'final-dinner'"
         :summary-lines="dinnerSummaryLines"
         :status="statusMessage"
+        :winter="WINTER_EFFECT_STEPS.includes(step)"
+        show-home
+        @home="returnHome"
       />
 
-      <!-- Скрытая игра к годовщине (доступность управляется configuration.json) -->
+      <!-- Новогодний квест (доступность управляется configuration.json) -->
       <StepStory
         v-else-if="step === 'anniversary-story'"
         :messages="ANNIVERSARY_STORY_MESSAGES"
+        winter
+        show-home
+        @home="returnHome"
         @finish="handleAnniversaryFinished"
       />
 
@@ -262,14 +304,21 @@ function handleAnniversaryFinished(): void {
         :summary-lines="ANNIVERSARY_SUMMARY_LINES"
         :status="statusMessage"
         show-gift
+        show-home
+        winter
+        complete-on-gift-reveal
+        @complete="finishActiveGame('gift')"
+        @home="returnHome"
       />
 
       <!-- V1: выбор страны, отеля и дат -->
-      <StepQuestion v-else-if="step === 'question'" @answer="step = 'countries'" />
+      <StepQuestion v-else-if="step === 'question'" @home="returnHome" @answer="step = 'countries'" />
 
       <StepCountries
         v-else-if="step === 'countries'"
         :selected="countries"
+        show-home
+        @home="returnHome"
         @toggle="toggleCountry"
         @next="handleCountriesNext"
       />
@@ -279,6 +328,8 @@ function handleAnniversaryFinished(): void {
         title="Выбери отель 🏨"
         hint="Только лучший вариант 😉"
         :options="HOTEL_OPTIONS"
+        show-home
+        @home="returnHome"
         @choose="handleHotelChoice"
       />
 
@@ -287,10 +338,18 @@ function handleAnniversaryFinished(): void {
         title="Даты 📅"
         hint="Идеальный план!"
         :options="DATE_OPTIONS"
+        show-home
+        @home="returnHome"
         @choose="handleDatesChoice"
       />
 
-      <StepFinal v-else :summary-lines="summaryLines" :status="statusMessage" />
+      <StepFinal
+        v-else
+        :summary-lines="summaryLines"
+        :status="statusMessage"
+        show-home
+        @home="returnHome"
+      />
     </Transition>
   </main>
 </template>

@@ -8,3 +8,5 @@ deno.lock
 *.log
 .DS_Store
 .vscode/
+acl-recovery/
+AGENTS.md

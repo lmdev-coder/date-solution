@@ -1,9 +1,14 @@
 <script setup lang="ts">
 /**
- * Decorative overlay of falling hearts and autumn leaves for the V3 game.
- * Each piece gets a random horizontal position, size, duration and delay —
- * randomized once on mount, then the CSS keeps them tumbling forever.
+ * Декоративный осенний дождь из сердечек и листьев; зимний вариант — снег.
+ * Параметры частиц задаются один раз при создании компонента.
  */
+interface Props {
+  winter?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), { winter: false });
+
 interface FallPiece {
   id: number;
   symbol: string;
@@ -13,32 +18,35 @@ interface FallPiece {
   size: number;
 }
 
+const SNOW_SYMBOLS = ['❄', '❅', '❆', '⛄'];
 const HEART_SYMBOLS = ['💖', '💕', '❤️', '💗'];
 const LEAF_SYMBOLS = ['🍁', '🍂', '🍃'];
-
-const PIECE_COUNT = 24;
+const PIECE_COUNT = props.winter ? 48 : 24;
 
 function randomBetween(min: number, max: number): number {
   return min + Math.random() * (max - min);
 }
 
 const pieces: FallPiece[] = Array.from({ length: PIECE_COUNT }, (_, index) => {
-  const isLeaf = index % 2 === 1;
-  const symbols = isLeaf ? LEAF_SYMBOLS : HEART_SYMBOLS;
+  const isSnowman = index % 9 === 0;
+  const isAutumn = !props.winter;
+  const symbols = props.winter ? SNOW_SYMBOLS : index % 2 === 0 ? HEART_SYMBOLS : LEAF_SYMBOLS;
+  const symbolIndex = props.winter ? index % 3 : Math.floor(index / 2) % 4;
+  const symbol = props.winter && isSnowman ? '⛄' : symbols[symbolIndex];
 
   return {
     id: index,
-    symbol: symbols[index % symbols.length],
+    symbol,
     left: randomBetween(0, 100),
-    duration: randomBetween(7, 15),
-    delay: randomBetween(0, 8),
-    size: randomBetween(18, 34),
+    duration: randomBetween(props.winter && isSnowman ? 13 : 7, props.winter && isSnowman ? 22 : 14),
+    delay: randomBetween(0, 12),
+    size: randomBetween(props.winter && isSnowman ? 31 : 18, props.winter && isSnowman ? 42 : isAutumn ? 34 : 32),
   };
 });
 </script>
 
 <template>
-  <div class="falling-effects" aria-hidden="true">
+  <div class="falling-effects" :class="{ 'falling-effects--winter': winter }" aria-hidden="true">
     <span
       v-for="piece in pieces"
       :key="piece.id"
@@ -48,6 +56,7 @@ const pieces: FallPiece[] = Array.from({ length: PIECE_COUNT }, (_, index) => {
         fontSize: `${piece.size}px`,
         animationDuration: `${piece.duration}s`,
         animationDelay: `${piece.delay}s`,
+        opacity: winter ? 0.58 + (piece.size / 100) : undefined,
       }"
     >
       {{ piece.symbol }}

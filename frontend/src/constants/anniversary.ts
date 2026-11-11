@@ -1,15 +1,12 @@
-/**
- * Content of the anniversary gift game. Availability is now controlled by the
- * remote `configuration.json` (active flags), not by a hardcoded date.
- */
+/** Новогодний мини-квест. Доступность по-прежнему управляется конфигурацией приложения. */
 
-/** Messages revealed one at a time before the gift easter egg. */
+/** Реплики, открывающиеся по одной перед поиском сюрприза. */
 export const ANNIVERSARY_STORY_MESSAGES: readonly string[] = [
-  'Люблю тебя, моя жена! Я так рад, что ты зашла на сайт именно в этот день 💕',
-  'С годовщиной нас — мы вместе уже целый год! 🎉',
+  'Любимая, у меня для тебя есть маленькое новогоднее приключение ✨',
+  'Кажется, Дед Мороз оставил для тебя подарок… Но сначала его нужно найти 🎄',
 ];
 
-/** Line shown on the gift screen, right above the clickable present. */
+/** Текст на экране новогоднего квеста перед поиском подарка. */
 export const ANNIVERSARY_SUMMARY_LINES: string[] = [
-  'Я очень надеюсь, что тебе понравится подарок',
+  'Снеговик спрятал для тебя подарок. Нажимай на него — и следуй за подсказкой ⛄',
 ];

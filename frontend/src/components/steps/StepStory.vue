@@ -6,11 +6,15 @@ import CatPair from '@/components/CatPair.vue';
 interface Props {
   /** Messages revealed one at a time via the "Далее" button. */
   messages: readonly string[];
+  /** Shows a home control inside the story card. */
+  showHome?: boolean;
+  /** Applies the shared New Year card theme. */
+  winter?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), { showHome: false, winter: false });
 
-const emit = defineEmits<{ finish: [] }>();
+const emit = defineEmits<{ finish: []; home: [] }>();
 
 const messageIndex = ref(0);
 
@@ -28,7 +32,10 @@ function showNextMessage(): void {
 </script>
 
 <template>
-  <section class="card">
+  <section class="card game-card" :class="{ 'winter-card': winter }">
+    <button v-if="showHome" type="button" class="home-control" aria-label="На главную" title="На главную" @click="emit('home')">
+      <span aria-hidden="true">×</span>
+    </button>
     <CatPair />
     <p class="story-message">{{ currentMessage }}</p>
     <button class="btn btn-primary" @click="showNextMessage">Далее 💬</button>

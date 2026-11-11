@@ -8,7 +8,7 @@ import {
   BREST_RETRY_MESSAGE,
 } from '@/constants/story';
 
-const emit = defineEmits<{ answer: [trip: boolean] }>();
+const emit = defineEmits<{ answer: [trip: boolean]; home: [] }>();
 
 const declineAttempts = ref(0);
 const isRetryPromptVisible = ref(false);
@@ -27,7 +27,10 @@ function declineTrip(): void {
 </script>
 
 <template>
-  <section class="card">
+  <section class="card game-card">
+    <button type="button" class="home-control" aria-label="На главную" title="На главную" @click="emit('home')">
+      <span aria-hidden="true">×</span>
+    </button>
     <CatPair variant="md" />
 
     <template v-if="isRetryPromptVisible">

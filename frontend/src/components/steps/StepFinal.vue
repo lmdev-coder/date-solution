@@ -6,14 +6,24 @@ interface Props {
   status: string;
   /** When true, shows the clickable gift easter egg. */
   showGift?: boolean;
+  showHome?: boolean;
+  completeOnGiftReveal?: boolean;
+  winter?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), { showGift: false });
+const props = withDefaults(defineProps<Props>(), {
+  showGift: false,
+  showHome: false,
+  completeOnGiftReveal: false,
+  winter: false,
+});
+const emit = defineEmits<{ home: []; complete: [] }>();
 
 const SHAKE_DURATION_MS = 550;
 
 const clicks = ref(0);
 const isShaking = ref(false);
+const isCompleted = ref(false);
 let shakeTimer: number | undefined;
 
 /**
@@ -37,19 +47,24 @@ const giftSymbol = computed(() => (stage.value === 'hint' ? '🚪' : '🎁'));
 const giftLabel = computed(() => {
   switch (stage.value) {
     case 'hint':
-      return 'Открой дверцу, где стоит сейф, любовь моя ❤️';
+      return 'Снеговик нашёл след! Загляни туда, где у нас хранятся сбережения, любимая ⛄';
     case 'second':
-      return 'Он всё растёт... Ещё немного! 😳';
+      return 'Кажется, подарок оживает… нажми ещё несколько раз! ✨';
     case 'first':
-      return 'Ого, он затрясся и подрос! 😮';
+      return 'Ой, подарок зашевелился! Кажется, внутри подсказка 🎁';
     default:
-      return 'Нажми на подарочек 😏';
+      return 'Нажми на подарок, чтобы найти новогодний сюрприз 🎄';
   }
 });
 
 function handleGiftClick(): void {
   clicks.value += 1;
   triggerShake();
+
+  if (props.completeOnGiftReveal && clicks.value >= 15 && !isCompleted.value) {
+    isCompleted.value = true;
+    emit('complete');
+  }
 }
 
 /** Restarts the shake animation so every click jiggles the gift. */
@@ -75,9 +90,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="card final-card">
-    <div class="hearts">💖💕💖</div>
-    <h1>Люблю тебя, красоточка! ❤️</h1>
+  <section class="card final-card game-card" :class="{ 'final-card--winter': winter }">
+    <button v-if="showHome" type="button" class="home-control" aria-label="На главную" title="На главную" @click="emit('home')">
+      <span aria-hidden="true">×</span>
+    </button>
+    <div class="hearts">{{ winter ? '❄️ 🎄 ❄️' : '💖💕💖' }}</div>
+    <h1>{{ winter ? 'С Новым годом, любимая! 🎄' : 'Люблю тебя, красоточка! ❤️' }}</h1>
     <p v-for="line in summaryLines" :key="line">{{ line }}</p>
 
     <button
@@ -88,11 +106,11 @@ onBeforeUnmount(() => {
       :aria-label="giftSymbol"
       @click="handleGiftClick"
     >
-      <span class="gift-symbol">{{ giftSymbol }}</span>
+      <span class="gift-symbol">{{ showGift ? (stage === 'hint' ? '⛄' : stage === 'second' ? '🎄' : '🎁') : giftSymbol }}</span>
     </button>
     <p v-if="props.showGift" class="gift-label">{{ giftLabel }}</p>
 
-    <div class="hearts">💖💕💖</div>
+    <div class="hearts">{{ winter ? '✨ ❄️ ✨' : '💖💕💖' }}</div>
     <p v-if="status" class="save-status">{{ status }}</p>
   </section>
 </template>
